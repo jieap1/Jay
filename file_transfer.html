@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebRTC 点对点文件传输工具</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 800px;
+      width: 100%;
+      padding: 40px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .header h1 {
+      color: #667eea;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    
+    .header p {
+      color: #999;
+      font-size: 14px;
+    }
+    
+    .role-selector {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+    
+    .role-btn {
+      flex: 1;
+      padding: 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    
+    .role-btn:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .role-btn.active {
+      border-color: #667eea;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .role-btn .icon {
+      font-size: 40px;
+      margin-bottom: 10px;
+    }
+    
+    .role-btn h3 {
+      font-size: 18px;
+      margin-bottom: 5px;
+    }
+    
+    .role-btn p {
+      font-size: 12px;
+      opacity: 0.8;
+    }
+    
+    .panel {
+      display: none;
+    }
+    
+    .panel.active {
+      display: block;
+    }
+    
+    .status-box {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-left: 4px solid #667eea;
+    }
+    
+    .status-box .title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    
+    .status-box .content {
+      color: #666;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    
+    .code-box {
+      background: #f5f5f5;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      word-break: break-all;
+    }
+    
+    .btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102,126,234,0.4);
+    }
+    
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .file-upload {
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-upload:hover {
+      border-color: #667eea;
+      background: #f8f9ff;
+    }
+    
+    .file-upload.dragover {
+      border-color: #667eea;
+      background: #f0f4ff;
+    }
+    
+    .file-upload .icon {
+      font-size: 48px;
+      margin-bottom: 10px;
+    }
+    
+    .file-upload p {
+      color: #999;
+      font-size: 14px;
+    }
+    
+    .progress-bar {
+      background: #f0f0f0;
+      border-radius: 10px;
+      height: 10px;
+      overflow: hidden;
+      margin: 10px 0;
+    }
+    
+    .progress-bar .fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 20px;
+    }
+    
+    .log {
+      background: #1e1e1e;
+      color: #00ff00;
+      padding: 15px;
+      border-radius: 8px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+    
+    .log .error {
+      color: #ff4444;
+    }
+    
+    .log .success {
+      color: #00ff00;
+    }
+    
+    .log .info {
+      color: #00aaff;
+    }
+    
+    .request-item {
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .request-item .info {
+      flex: 1;
+    }
+    
+    .request-item .name {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    
+    .request-item .meta {
+      font-size: 12px;
+      color: #999;
+    }
+    
+    .request-item .actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .btn-small {
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    
+    .btn-success {
+      background: linear-gradient(135deg, #00c853 0%, #00a843 100%);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ff5252 0%, #d32f2f 100%);
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      animation: slideIn 0.3s ease;
+      z-index: 1000;
+    }
+    
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📤 WebRTC 文件传输</h1>
+      <p>点对点传输 · 安全加密 · 无需服务器中转</p>
+    </div>
+    
+    <div class="role-selector">
+      <div class="role-btn" onclick="selectRole('sender')" id="senderBtn">
+        <div class="icon">📤</div>
+        <h3>发送文件</h3>
+        <p>选择文件发送给对方</p>
+      </div>
+      <div class="role-btn" onclick="selectRole('receiver')" id="receiverBtn">
+        <div class="icon">📥</div>
+        <h3>接收文件</h3>
+        <p>等待接收传输请求</p>
+      </div>
+    </div>
+    
+    <!-- 发送端面板 -->
+    <div class="panel" id="senderPanel">
+      <div class="status-box">
+        <div class="title">📋 发送步骤</div>
+        <div class="content">
+          1. 选择要发送的文件<br>
+          2. 生成连接代码<br>
+          3. 将连接代码发送给接收方<br>
+          4. 接收方输入代码后，等待确认<br>
+          5. 开始传输
+        </div>
+      </div>
+      
+      <div class="file-upload" id="fileDropZone">
+        <div class="icon">📁</div>
+        <p>点击选择文件或拖拽文件到此处</p>
+        <input type="file" id="fileInput" style="display: none;">
+      </div>
+      
+      <div id="fileInfo" style="display: none;">
+        <p><strong>已选择:</strong> <span id="fileName"></span></p>
+        <p><strong>大小:</strong> <span id="fileSize"></span></p>
+        <button class="btn" onclick="generateConnectionCode()">生成连接代码</button>
+      </div>
+      
+      <div id="senderCodeBox" style="display: none;">
+        <div class="status-box">
+          <div class="title">🔗 连接代码</div>
+          <div class="content">
+            请将以下代码发送给接收方：
+          </div>
+        </div>
+        <div class="code-box" id="senderCode"></div>
+        <p style="color: #999; font-size: 13px; margin-bottom: 20px;">
+          等待接收方确认连接...
+        </p>
+        <div id="senderProgress" style="display: none;">
+          <div class="progress-info">
+            <span id="senderProgressText">0%</span>
+            <span id="senderSpeed">0 KB/s</span>
+          </div>
+          <div class="progress-bar">
+            <div class="fill" id="senderProgressBar"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="log" id="senderLog"></div>
+    </div>
+    
+    <!-- 接收端面板 -->
+    <div class="panel" id="receiverPanel">
+      <div class="status-box">
+        <div class="title">📋 接收步骤</div>
+        <div class="content">
+          1. 输入发送方提供的连接代码<br>
+          2. 查看文件信息<br>
+          3. 确认接收文件<br>
+          4. 开始下载
+        </div>
+      </div>
+      
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; margin-bottom: 8px; font-weight: 600;">
+          连接代码:
+        </label>
+        <input type="text" id="receiverCodeInput" 
+               placeholder="粘贴发送方的连接代码"
+               style="width: 100%; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 14px;">
+      </div>
+      
+      <button class="btn" onclick="parseConnectionCode()">解析连接请求</button>
+      
+      <div id="requestList" style="margin-top: 20px;"></div>
+      
+      <div id="receiverProgress" style="display: none;">
+        <div class="progress-info">
+          <span id="receiverProgressText">0%</span>
+          <span id="receiverSpeed">0 KB/s</span>
+        </div>
+        <div class="progress-bar">
+          <div class="fill" id="receiverProgressBar"></div>
+        </div>
+      </div>
+      
+      <div class="log" id="receiverLog"></div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
+  <script>
+    let peer = null;
+    let connection = null;
+    let selectedFile = null;
+    let fileData = null;
+    let receivedSize = 0;
+    let totalSize = 0;
+    let lastTime = 0;
+    let lastReceived = 0;
+    
+    function selectRole(role) {
+      document.querySelectorAll('.role-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+      
+      if (role === 'sender') {
+        document.getElementById('senderBtn').classList.add('active');
+        document.getElementById('senderPanel').classList.add('active');
+      } else {
+        document.getElementById('receiverBtn').classList.add('active');
+        document.getElementById('receiverPanel').classList.add('active');
+      }
+    }
+    
+    function log(containerId, message, type = 'info') {
+      const log = document.getElementById(containerId);
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = type;
+      div.textContent = `[${time}] ${message}`;
+      log.appendChild(div);
+      log.scrollTop = log.scrollHeight;
+    }
+    
+    function formatSize(bytes) {
+      if (bytes === 0) return '0 B';
+      const k = 1024;
+      const sizes = ['B', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return (bytes / Math.pow(k, i)).toFixed(2) + ' ' + sizes[i];
+    }
+    
+    // 文件选择处理
+    const fileDropZone = document.getElementById('fileDropZone');
+    const fileInput = document.getElementById('fileInput');
+    
+    fileDropZone.addEventListener('click', () => fileInput.click());
+    fileDropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      fileDropZone.classList.add('dragover');
+    });
+    fileDropZone.addEventListener('dragleave', () => {
+      fileDropZone.classList.remove('dragover');
+    });
+    fileDropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      fileDropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+    fileInput.addEventListener('change', (e) => {
+      if (e.target.files.length) {
+        handleFile(e.target.files[0]);
+      }
+    });
+    
+    function handleFile(file) {
+      selectedFile = file;
+      document.getElementById('fileInfo').style.display = 'block';
+      document.getElementById('fileName').textContent = file.name;
+      document.getElementById('fileSize').textContent = formatSize(file.size);
+      document.getElementById('fileDropZone').style.display = 'none';
+      log('senderLog', `已选择文件: ${file.name} (${formatSize(file.size)})`, 'success');
+    }
+    
+    // 发送端 - 生成连接代码
+    async function generateConnectionCode() {
+      if (!selectedFile) return;
+      
+      log('senderLog', '正在生成连接代码...', 'info');
+      
+      try {
+        peer = new Peer();
+        
+        peer.on('open', (id) => {
+          const code = btoa(JSON.stringify({
+            peerId: id,
+            fileName: selectedFile.name,
+            fileSize: selectedFile.size,
+            fileType: selectedFile.type
+          }));
+          
+          document.getElementById('senderCode').textContent = code;
+          document.getElementById('senderCodeBox').style.display = 'block';
+          log('senderLog', '连接代码已生成，请发送给接收方', 'success');
+        });
+        
+        peer.on('connection', (conn) => {
+          connection = conn;
+          log('senderLog', '接收方已连接', 'success');
+          
+          conn.on('open', () => {
+            log('senderLog', '等待接收方确认...', 'info');
+            
+            // 监听接收方的确认
+            conn.on('data', async (data) => {
+              if (data.type === 'confirm') {
+                log('senderLog', '接收方已确认，开始传输', 'success');
+                await sendFile(conn);
+              } else if (data.type === 'reject') {
+                log('senderLog', '接收方拒绝了传输请求', 'error');
+                showNotification('接收方拒绝了传输请求');
+              } else if (data.type === 'progress') {
+                updateProgress(data.received, data.total, 'sender');
+              } else if (data.type === 'complete') {
+                log('senderLog', '文件传输完成', 'success');
+                showNotification('文件传输完成');
+              }
+            });
+          });
+          
+          conn.on('close', () => {
+            log('senderLog', '连接已关闭', 'info');
+          });
+          
+          conn.on('error', (err) => {
+            log('senderLog', `连接错误: ${err}`, 'error');
+          });
+        });
+        
+        peer.on('error', (err) => {
+          log('senderLog', `PeerJS 错误: ${err}`, 'error');
+        });
+      } catch (error) {
+        log('senderLog', `生成连接代码失败: ${error}`, 'error');
+      }
+    }
+    
+    // 发送文件
+    async function sendFile(conn) {
+      const chunkSize = 16384; // 16KB chunks
+      const file = selectedFile;
+      const totalChunks = Math.ceil(file.size / chunkSize);
+      
+      document.getElementById('senderProgress').style.display = 'block';
+      document.getElementById('senderProgressBar').style.width = '0%';
+      
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
+        const data = await chunk.arrayBuffer();
+        
+        conn.send({
+          type: 'chunk',
+          data: data,
+          index: i,
+          total: totalChunks
+        });
+        
+        const progress = Math.round((end / file.size) * 100);
+        document.getElementById('senderProgressText').textContent = progress + '%';
+        document.getElementById('senderProgressBar').style.width = progress + '%';
+        
+        // 计算速度
+        const now = Date.now();
+        const speed = (end - lastReceived) / ((now - lastTime) / 1000);
+        document.getElementById('senderSpeed').textContent = formatSize(speed) + '/s';
+        lastTime = now;
+        lastReceived = end;
+      }
+      
+      conn.send({ type: 'end', fileName: file.name });
+      log('senderLog', '所有数据块已发送', 'info');
+    }
+    
+    // 接收端 - 解析连接代码
+    function parseConnectionCode() {
+      const code = document.getElementById('receiverCodeInput').value.trim();
+      if (!code) {
+        log('receiverLog', '请输入连接代码', 'error');
+        return;
+      }
+      
+      try {
+        const data = JSON.parse(atob(code));
+        log('receiverLog', `解析成功，文件: ${data.fileName} (${formatSize(data.fileSize)})`, 'success');
+        
+        showRequest(data);
+      } catch (error) {
+        log('receiverLog', '连接代码无效', 'error');
+      }
+    }
+    
+    function showRequest(data) {
+      const requestList = document.getElementById('requestList');
+      requestList.innerHTML = '';
+      
+      const item = document.createElement('div');
+      item.className = 'request-item';
+      item.innerHTML = `
+        <div class="icon">📄</div>
+        <div class="info">
+          <div class="name">${data.fileName}</div>
+          <div class="meta">大小: ${formatSize(data.fileSize)}</div>
+        </div>
+        <div class="actions">
+          <button class="btn btn-small btn-success" onclick="acceptTransfer('${data.peerId}')">接收</button>
+          <button class="btn btn-small btn-danger" onclick="rejectTransfer()">拒绝</button>
+        </div>
+      `;
+      requestList.appendChild(item);
+      
+      // 保存当前请求信息
+      window.currentRequest = data;
+    }
+    
+    // 接收传输请求
+    async function acceptTransfer(peerId) {
+      log('receiverLog', '正在连接发送方...', 'info');
+      
+      try {
+        peer = new Peer();
+        
+        peer.on('open', () => {
+          connection = peer.connect(peerId);
+          
+          connection.on('open', () => {
+            log('receiverLog', '已连接到发送方，等待文件传输...', 'success');
+            
+            // 发送确认
+            connection.send({ type: 'confirm' });
+            document.getElementById('receiverProgress').style.display = 'block';
+            
+            // 准备接收文件
+            const chunks = [];
+            receivedSize = 0;
+            totalSize = window.currentRequest.fileSize;
+            lastTime = Date.now();
+            lastReceived = 0;
+            
+            connection.on('data', async (data) => {
+              if (data.type === 'chunk') {
+                chunks.push(data.data);
+                receivedSize += data.data.byteLength;
+                
+                const progress = Math.round((receivedSize / totalSize) * 100);
+                document.getElementById('receiverProgressText').textContent = progress + '%';
+                document.getElementById('receiverProgressBar').style.width = progress + '%';
+                
+                // 计算速度
+                const now = Date.now();
+                const speed = (receivedSize - lastReceived) / ((now - lastTime) / 1000);
+                document.getElementById('receiverSpeed').textContent = formatSize(speed) + '/s';
+                lastTime = now;
+                lastReceived = receivedSize;
+                
+                // 发送进度更新
+                connection.send({
+                  type: 'progress',
+                  received: receivedSize,
+                  total: totalSize
+                });
+              } else if (data.type === 'end') {
+                // 合并所有数据块
+                const blob = new Blob(chunks);
+                const url = URL.createObjectURL(blob);
+                
+                // 下载文件
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = data.fileName;
+                a.click();
+                
+                log('receiverLog', '文件接收完成，已自动下载', 'success');
+                showNotification('文件接收完成');
+                
+                connection.send({ type: 'complete' });
+              }
+            });
+            
+            connection.on('close', () => {
+              log('receiverLog', '连接已关闭', 'info');
+            });
+            
+            connection.on('error', (err) => {
+              log('receiverLog', `连接错误: ${err}`, 'error');
+            });
+          });
+        });
+        
+        peer.on('error', (err) => {
+          log('receiverLog', `PeerJS 错误: ${err}`, 'error');
+        });
+      } catch (error) {
+        log('receiverLog', `连接失败: ${error}`, 'error');
+      }
+    }
+    
+    function rejectTransfer() {
+      document.getElementById('requestList').innerHTML = '';
+      log('receiverLog', '已拒绝传输请求', 'info');
+      showNotification('已拒绝传输请求');
+    }
+    
+    function updateProgress(current, total, type) {
+      const progress = Math.round((current / total) * 100);
+      const progressText = document.getElementById(type + 'ProgressText');
+      const progressBar = document.getElementById(type + 'ProgressBar');
+      
+      if (progressText) progressText.textContent = progress + '%';
+      if (progressBar) progressBar.style.width = progress + '%';
+    }
+    
+    function showNotification(message) {
+      const notification = document.createElement('div');
+      notification.className = 'notification';
+      notification.textContent = message;
+      document.body.appendChild(notification);
+      
+      setTimeout(() => {
+        notification.remove();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
