@@ -336,6 +336,32 @@
       font-size: 11px;
       resize: vertical;
     }
+    
+    .step-indicator {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .step {
+      flex: 1;
+      padding: 10px;
+      background: #e0e0e0;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .step.active {
+      background: #667eea;
+      color: white;
+    }
+    
+    .step.completed {
+      background: #00c853;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -365,14 +391,19 @@
         <div class="content">
           <ol class="step-list">
             <li>选择要发送的文件</li>
-            <li>生成连接代码</li>
-            <li>复制连接代码发送给接收方</li>
-            <li>等待接收方粘贴连接代码并发送offer</li>
-            <li>复制offer，发送给接收方</li>
-            <li>复制接收方的answer</li>
-            <li>粘贴answer，开始传输</li>
+            <li>生成连接代码和 Offer</li>
+            <li>将连接代码和 Offer 发送给接收方</li>
+            <li>等待接收方发来 Answer</li>
+            <li>粘贴 Answer，开始传输</li>
           </ol>
         </div>
+      </div>
+      
+      <div class="step-indicator">
+        <div class="step" id="senderStep1">选择文件</div>
+        <div class="step" id="senderStep2">生成连接</div>
+        <div class="step" id="senderStep3">等待Answer</div>
+        <div class="step" id="senderStep4">传输中</div>
       </div>
       
       <div class="file-upload" id="fileDropZone">
@@ -389,7 +420,7 @@
       
       <div id="senderCodeBox" style="display: none;">
         <div class="status-box">
-          <div class="title">🔗 步骤 1: 连接代码</div>
+          <div class="title">🔗 步骤 2: 连接代码</div>
           <div class="content">请将此代码发送给接收方：</div>
         </div>
         <div class="code-box">
@@ -397,20 +428,18 @@
           <div id="senderCode"></div>
         </div>
         
-        <div class="status-box" id="senderOfferBox" style="display: none;">
-          <div class="title">📤 步骤 2: 等待接收方的 Offer</div>
+        <div class="status-box">
+          <div class="title">📤 Offer (发送给接收方)</div>
           <div class="content">
-            等待接收方粘贴连接代码并发送 offer。<br>
-            收到 offer 后，复制下方内容：
+            将下方的 Offer 发送给接收方：
           </div>
         </div>
-        <div class="offer-box" id="senderOfferDisplay" style="display: none;">
-          <div class="title">Offer (点击复制)</div>
+        <div class="offer-box">
           <textarea id="senderOffer" readonly onclick="this.select(); document.execCommand('copy');"></textarea>
         </div>
         
         <div class="status-box" id="senderAnswerBox" style="display: none;">
-          <div class="title">📥 步骤 3: 粘贴接收方的 Answer</div>
+          <div class="title">📥 粘贴接收方的 Answer</div>
           <div class="content">
             将接收方发来的 answer 粘贴到下方：
           </div>
@@ -441,12 +470,19 @@
         <div class="content">
           <ol class="step-list">
             <li>输入发送方提供的连接代码</li>
-            <li>点击"解析连接代码"查看文件信息</li>
-            <li>确认接收后，复制 Offer 发送给发送方</li>
-            <li>等待发送方的 Answer</li>
-            <li>粘贴 Answer，开始接收</li>
+            <li>查看文件信息并确认接收</li>
+            <li>粘贴发送方的 Offer，生成 Answer</li>
+            <li>将 Answer 发送给发送方</li>
+            <li>等待接收文件</li>
           </ol>
         </div>
+      </div>
+      
+      <div class="step-indicator">
+        <div class="step" id="receiverStep1">输入代码</div>
+        <div class="step" id="receiverStep2">生成Answer</div>
+        <div class="step" id="receiverStep3">等待传输</div>
+        <div class="step" id="receiverStep4">接收中</div>
       </div>
       
       <div style="margin-bottom: 20px;">
@@ -455,25 +491,30 @@
         </label>
         <textarea id="receiverCodeInput" 
                placeholder="粘贴发送方的连接代码..."
-               style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: 'Courier New', monospace;"></textarea>
+               style="width: 100%; min-height: 80px; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; font-size: 13px; font-family: 'Courier New', monospace;"></textarea>
       </div>
       
       <button class="btn" id="parseBtn" onclick="parseConnectionCode()">解析连接代码</button>
       
       <div id="requestList" style="margin-top: 20px;"></div>
       
-      <div class="offer-box" id="receiverOfferBox" style="display: none;">
-        <div class="title">📤 Offer (点击复制后发送给发送方)</div>
-        <textarea id="receiverOffer" readonly onclick="this.select(); document.execCommand('copy');"></textarea>
+      <div class="status-box" id="receiverOfferBox" style="display: none;">
+        <div class="title">📥 粘贴发送方的 Offer</div>
+        <div class="content">
+          将发送方发来的 Offer 粘贴到下方：
+        </div>
+      </div>
+      <div class="offer-box" id="receiverOfferInput" style="display: none;">
+        <textarea id="receiverOfferInput" placeholder="粘贴发送方的 Offer..."></textarea>
+        <button class="btn" onclick="handleReceiverOffer()" style="margin-top: 10px;">生成 Answer</button>
       </div>
       
       <div class="status-box" id="receiverAnswerBox" style="display: none;">
-        <div class="title">📥 粘贴发送方的 Answer</div>
-        <div class="content">将发送方发来的 answer 粘贴到下方：</div>
+        <div class="title">📤 Answer (发送给发送方)</div>
+        <div class="content">点击复制后发送给发送方：</div>
       </div>
-      <div class="offer-box" id="receiverAnswerInput" style="display: none;">
-        <textarea id="receiverAnswerInput" placeholder="粘贴发送方的 answer..."></textarea>
-        <button class="btn" onclick="handleReceiverAnswer()" style="margin-top: 10px;">确认 Answer</button>
+      <div class="offer-box" id="receiverAnswerDisplay" style="display: none;">
+        <textarea id="receiverAnswer" readonly onclick="this.select(); document.execCommand('copy');"></textarea>
       </div>
       
       <div id="receiverProgress" style="display: none;">
@@ -502,7 +543,6 @@
     let localConnection = null;
     let dataChannel = null;
     let selectedFile = null;
-    let fileChunks = [];
     let receivedChunks = [];
     let receivedSize = 0;
     let totalSize = 0;
@@ -539,6 +579,19 @@
         document.execCommand('copy');
         alert('已复制到剪贴板！');
       });
+    }
+
+    function setStep(type, step) {
+      const prefix = type === 'sender' ? 'sender' : 'receiver';
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(prefix + 'Step' + i);
+        el.classList.remove('active', 'completed');
+        if (i < step) {
+          el.classList.add('completed');
+        } else if (i === step) {
+          el.classList.add('active');
+        }
+      }
     }
 
     function selectRole(role) {
@@ -586,6 +639,7 @@
       document.getElementById('fileSize').textContent = formatSize(file.size);
       document.getElementById('fileDropZone').style.display = 'none';
       log('senderLog', `已选择文件: ${file.name} (${formatSize(file.size)})`, 'success');
+      setStep('sender', 2);
     }
 
     // ========== 发送端 ==========
@@ -597,20 +651,29 @@
       }
 
       log('senderLog', '正在创建连接...', 'info');
+      document.getElementById('generateBtn').disabled = true;
 
       try {
         localConnection = new RTCPeerConnection(config);
-        
+
+        // 监听连接状态
+        localConnection.onconnectionstatechange = () => {
+          const state = localConnection.connectionState;
+          log('senderLog', `连接状态: ${state}`, 'info');
+          
+          if (state === 'connected') {
+            setStep('sender', 4);
+          }
+        };
+
+        localConnection.oniceconnectionstatechange = () => {
+          const state = localConnection.iceConnectionState;
+          log('senderLog', `ICE 连接状态: ${state}`, 'info');
+        };
+
         // 创建数据通道
         dataChannel = localConnection.createDataChannel('fileTransfer');
         setupDataChannel(dataChannel);
-
-        // 监听 ICE 候选
-        localConnection.onicecandidate = (event) => {
-          if (event.candidate) {
-            // 等待所有 ICE 候选收集完成
-          }
-        };
 
         // 创建 Offer
         localConnection.createOffer()
@@ -619,6 +682,7 @@
             return localConnection.setLocalDescription(offer);
           })
           .then(() => {
+            log('senderLog', '正在收集 ICE 候选...', 'info');
             // 等待 ICE 收集完成
             return new Promise(resolve => {
               if (localConnection.iceGatheringState === 'complete') {
@@ -634,8 +698,9 @@
             });
           })
           .then(() => {
+            log('senderLog', 'ICE 收集完成', 'success');
+
             // 显示连接代码和 Offer
-            // 使用 encodeURIComponent 处理中文
             const fileInfo = JSON.stringify({
               fileName: selectedFile.name,
               fileSize: selectedFile.size,
@@ -644,20 +709,23 @@
             const connectionCode = btoa(encodeURIComponent(fileInfo));
             
             document.getElementById('senderCode').textContent = connectionCode;
+            document.getElementById('senderOffer').value = JSON.stringify(localConnection.localDescription);
             document.getElementById('senderCodeBox').style.display = 'block';
-            log('senderLog', '连接代码已生成，请发送给接收方', 'success');
+            document.getElementById('senderAnswerBox').style.display = 'block';
+            document.getElementById('senderAnswerInput').style.display = 'block';
+            
+            setStep('sender', 3);
+            log('senderLog', '连接代码和 Offer 已生成', 'success');
+            log('senderLog', '请发送给接收方，然后等待 Answer', 'info');
           })
           .catch(error => {
             log('senderLog', `创建连接失败: ${error.message}`, 'error');
+            document.getElementById('generateBtn').disabled = false;
           });
-
-        // 监听连接状态
-        localConnection.onconnectionstatechange = () => {
-          log('senderLog', `连接状态: ${localConnection.connectionState}`, 'info');
-        };
 
       } catch (error) {
         log('senderLog', `初始化失败: ${error.message}`, 'error');
+        document.getElementById('generateBtn').disabled = false;
       }
     }
 
@@ -688,7 +756,7 @@
     }
 
     async function sendFile() {
-      const chunkSize = 16384; // 16KB
+      const chunkSize = 16384;
       const file = selectedFile;
       const totalChunks = Math.ceil(file.size / chunkSize);
       
@@ -716,7 +784,6 @@
         document.getElementById('senderProgressText').textContent = progress + '%';
         document.getElementById('senderProgressBar').style.width = progress + '%';
         
-        // 计算速度
         const now = Date.now();
         const elapsed = (now - lastUpdateTime) / 1000;
         if (elapsed >= 0.5) {
@@ -771,6 +838,7 @@
         totalSize = data.fileSize;
         
         showRequest(data);
+        setStep('receiver', 2);
       } catch (error) {
         log('receiverLog', `连接代码无效: ${error.message}`, 'error');
         alert('连接代码格式错误，请检查后重试');
@@ -802,11 +870,19 @@
 
       try {
         localConnection = new RTCPeerConnection(config);
-        
-        localConnection.onicecandidate = (event) => {
-          if (event.candidate) {
-            // 等待所有 ICE 候选收集完成
+
+        localConnection.onconnectionstatechange = () => {
+          const state = localConnection.connectionState;
+          log('receiverLog', `连接状态: ${state}`, 'info');
+          
+          if (state === 'connected') {
+            setStep('receiver', 4);
           }
+        };
+
+        localConnection.oniceconnectionstatechange = () => {
+          const state = localConnection.iceConnectionState;
+          log('receiverLog', `ICE 连接状态: ${state}`, 'info');
         };
 
         localConnection.ondatachannel = (event) => {
@@ -814,13 +890,37 @@
           setupReceiverDataChannel(dataChannel);
         };
 
-        localConnection.createOffer()
-          .then(offer => {
-            log('receiverLog', 'Offer 已创建', 'success');
-            return localConnection.setLocalDescription(offer);
+        // 显示 Offer 输入框
+        document.getElementById('receiverOfferBox').style.display = 'block';
+        document.getElementById('receiverOfferInput').style.display = 'block';
+        log('receiverLog', '请粘贴发送方的 Offer', 'info');
+
+      } catch (error) {
+        log('receiverLog', `初始化失败: ${error.message}`, 'error');
+      }
+    }
+
+    function handleReceiverOffer() {
+      const offerText = document.getElementById('receiverOfferInput').value.trim();
+      if (!offerText) {
+        alert('请粘贴 Offer');
+        return;
+      }
+
+      try {
+        const offer = JSON.parse(offerText);
+        
+        localConnection.setRemoteDescription(new RTCSessionDescription(offer))
+          .then(() => {
+            log('receiverLog', 'Offer 已设置', 'success');
+            return localConnection.createAnswer();
+          })
+          .then(answer => {
+            log('receiverLog', 'Answer 已创建', 'success');
+            return localConnection.setLocalDescription(answer);
           })
           .then(() => {
-            // 等待 ICE 收集完成
+            log('receiverLog', '正在收集 ICE 候选...', 'info');
             return new Promise(resolve => {
               if (localConnection.iceGatheringState === 'complete') {
                 resolve();
@@ -835,18 +935,20 @@
             });
           })
           .then(() => {
-            // 显示 Offer
-            const offerText = JSON.stringify(localConnection.localDescription);
-            document.getElementById('receiverOffer').value = offerText;
-            document.getElementById('receiverOfferBox').style.display = 'block';
-            log('receiverLog', 'Offer 已生成，请复制并发送给发送方', 'success');
+            log('receiverLog', 'Answer 已生成，请发送给发送方', 'success');
+            
+            document.getElementById('receiverAnswer').value = JSON.stringify(localConnection.localDescription);
+            document.getElementById('receiverAnswerBox').style.display = 'block';
+            document.getElementById('receiverAnswerDisplay').style.display = 'block';
+            
+            setStep('receiver', 3);
           })
           .catch(error => {
-            log('receiverLog', `创建连接失败: ${error.message}`, 'error');
+            log('receiverLog', `处理 Offer 失败: ${error.message}`, 'error');
           });
 
       } catch (error) {
-        log('receiverLog', `初始化失败: ${error.message}`, 'error');
+        log('receiverLog', `Offer 格式错误: ${error.message}`, 'error');
       }
     }
 
@@ -882,7 +984,6 @@
           document.getElementById('receiverProgressText').textContent = progress + '%';
           document.getElementById('receiverProgressBar').style.width = progress + '%';
           
-          // 计算速度
           const now = Date.now();
           const elapsed = (now - lastUpdateTime) / 1000;
           if (elapsed >= 0.5) {
@@ -892,7 +993,6 @@
             lastReceivedSize = receivedSize;
           }
           
-          // 发送进度更新
           channel.send({
             type: 'progress',
             received: receivedSize,
@@ -900,11 +1000,9 @@
           });
           
         } else if (data.type === 'end') {
-          // 合并所有数据块
           const blob = new Blob(receivedChunks);
           const url = URL.createObjectURL(blob);
           
-          // 下载文件
           const a = document.createElement('a');
           a.href = url;
           a.download = data.fileName;
@@ -914,27 +1012,6 @@
           channel.send({ type: 'complete' });
         }
       };
-    }
-
-    function handleReceiverAnswer() {
-      const answerText = document.getElementById('receiverAnswerInput').value.trim();
-      if (!answerText) {
-        alert('请粘贴 Answer');
-        return;
-      }
-
-      try {
-        const answer = JSON.parse(answerText);
-        localConnection.setRemoteDescription(new RTCSessionDescription(answer))
-          .then(() => {
-            log('receiverLog', 'Answer 已设置，等待连接建立...', 'success');
-          })
-          .catch(error => {
-            log('receiverLog', `设置 Answer 失败: ${error.message}`, 'error');
-          });
-      } catch (error) {
-        log('receiverLog', `Answer 格式错误: ${error.message}`, 'error');
-      }
     }
 
     function rejectTransfer() {
