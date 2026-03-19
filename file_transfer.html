@@ -305,6 +305,13 @@
       <p>点对点传输 · 安全加密 · 无需服务器中转</p>
     </div>
     
+    <div class="status-box" id="browserInfo" style="background: #e3f2fd; border-left-color: #2196f3;">
+      <div class="title">🔍 浏览器兼容性检查</div>
+      <div class="content" id="browserCheckResult">
+        正在检查...
+      </div>
+    </div>
+    
     <div class="role-selector">
       <div class="role-btn" onclick="selectRole('sender')" id="senderBtn">
         <div class="icon">📤</div>
@@ -409,6 +416,58 @@
     </div>
   </div>
 
+  <script>
+    // 浏览器兼容性检查
+    function checkBrowserCompatibility() {
+      const result = document.getElementById('browserCheckResult');
+      const info = [];
+      
+      // 检查 RTCPeerConnection
+      if (window.RTCPeerConnection || window.webkitRTCPeerConnection || window.mozRTCPeerConnection) {
+        info.push('✓ WebRTC 支持');
+      } else {
+        info.push('✗ WebRTC 不支持 - 请使用 Chrome/Firefox/Edge');
+      }
+      
+      // 检查浏览器类型
+      const userAgent = navigator.userAgent;
+      if (userAgent.includes('Chrome')) {
+        info.push('✓ 浏览器: Chrome');
+      } else if (userAgent.includes('Firefox')) {
+        info.push('✓ 浏览器: Firefox');
+      } else if (userAgent.includes('Edg')) {
+        info.push('✓ 浏览器: Edge');
+      } else if (userAgent.includes('Safari')) {
+        info.push('⚠ 浏览器: Safari - WebRTC 支持有限');
+      } else if (userAgent.includes('Ubuntu') || userAgent.includes('Linux')) {
+        info.push('ℹ 系统: Linux/Ubuntu');
+      } else {
+        info.push('ℹ 浏览器: 未知');
+      }
+      
+      // 检查 HTTPS
+      if (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+        info.push('✓ 环境安全 (HTTPS/localhost)');
+      } else {
+        info.push('⚠ 警告: 非安全环境 - WebRTC 需要 HTTPS 或 localhost');
+      }
+      
+      result.innerHTML = info.join('<br>');
+      
+      // 针对 Ubuntu 的特殊建议
+      if (userAgent.includes('Ubuntu') || userAgent.includes('Linux')) {
+        info.push('');
+        info.push('💡 Ubuntu/Linux 建议:');
+        info.push('• 推荐使用 Chrome 或 Firefox');
+        info.push('• 确保浏览器允许 WebRTC');
+        info.push('• 检查防火墙设置');
+        result.innerHTML = info.join('<br>');
+      }
+    }
+    
+    // 页面加载时执行检查
+    window.addEventListener('DOMContentLoaded', checkBrowserCompatibility);
+  </script>
   <script src="https://cdn.jsdelivr.net/npm/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <script>
     let peer = null;
@@ -508,26 +567,47 @@
         return;
       }
 
+      // 检查浏览器支持
+      if (!window.RTCPeerConnection) {
+        log('senderLog', '您的浏览器不支持 WebRTC', 'error');
+        alert('您的浏览器不支持 WebRTC，请使用 Chrome、Firefox 或最新版 Edge');
+        return;
+      }
+
       log('senderLog', '正在生成分享码...', 'info');
       document.getElementById('generateBtn').disabled = true;
 
       try {
+        // 检查是否在 HTTPS 环境（localhost 除外）
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+          log('senderLog', '警告: 需要使用 HTTPS 或 localhost', 'error');
+          alert('WebRTC 需要 HTTPS 环境或 localhost。如果您在本地测试，请使用 localhost 访问。');
+          document.getElementById('generateBtn').disabled = false;
+          return;
+        }
+
+        log('senderLog', '正在连接 PeerJS 服务器...', 'info');
+
         // 创建 Peer
         peer = new Peer(null, {
           debug: 2
         });
 
-        // 超时处理
+        // 超时处理（延长到 60 秒）
         const timeout = setTimeout(() => {
           if (!peer.id) {
-            log('senderLog', '连接服务器超时，请重试', 'error');
+            log('senderLog', '连接服务器超时，请检查网络', 'error');
+            log('senderLog', '可能的原因：', 'error');
+            log('senderLog', '1. 网络连接问题', 'error');
+            log('senderLog', '2. 防火墙阻止了连接', 'error');
+            log('senderLog', '3. PeerJS 服务器暂时不可用', 'error');
             document.getElementById('generateBtn').disabled = false;
           }
-        }, 30000);
+        }, 60000);
 
         peer.on('open', (id) => {
           clearTimeout(timeout);
-          log('senderLog', `PeerID 已生成: ${id}`, 'success');
+          log('senderLog', `✓ PeerID 已生成: ${id}`, 'success');
 
           // 生成分享码
           const shareCode = btoa(encodeURIComponent(JSON.stringify({
@@ -572,7 +652,17 @@
 
         peer.on('error', (err) => {
           log('senderLog', `PeerJS 错误: ${err}`, 'error');
+          log('senderLog', `错误类型: ${err.type}`, 'error');
           document.getElementById('generateBtn').disabled = false;
+          
+          // 针对常见错误给出建议
+          if (err.type === 'peer-unavailable') {
+            log('senderLog', 'PeerID 不可用，请重试', 'error');
+          } else if (err.type === 'server-error') {
+            log('senderLog', 'PeerJS 服务器错误，请稍后重试', 'error');
+          } else if (err.type === 'network') {
+            log('senderLog', '网络错误，请检查网络连接', 'error');
+          }
         });
 
       } catch (error) {
@@ -672,16 +762,29 @@
     function acceptTransfer(peerId) {
       log('receiverLog', '正在连接发送方...', 'info');
 
+      // 检查浏览器支持
+      if (!window.RTCPeerConnection) {
+        log('receiverLog', '您的浏览器不支持 WebRTC', 'error');
+        alert('您的浏览器不支持 WebRTC，请使用 Chrome、Firefox 或最新版 Edge');
+        return;
+      }
+
       try {
+        log('receiverLog', '正在连接 PeerJS 服务器...', 'info');
+
         peer = new Peer(null, {
           debug: 2
         });
 
         const timeout = setTimeout(() => {
           if (!peer.id) {
-            log('receiverLog', '连接服务器超时，请重试', 'error');
+            log('receiverLog', '连接服务器超时，请检查网络', 'error');
+            log('receiverLog', '可能的原因：', 'error');
+            log('receiverLog', '1. 网络连接问题', 'error');
+            log('receiverLog', '2. 防火墙阻止了连接', 'error');
+            log('receiverLog', '3. PeerJS 服务器暂时不可用', 'error');
           }
-        }, 30000);
+        }, 60000);
 
         peer.on('open', () => {
           clearTimeout(timeout);
