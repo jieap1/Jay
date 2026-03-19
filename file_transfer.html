@@ -476,24 +476,45 @@
     // 发送端 - 生成连接代码
     async function generateConnectionCode() {
       if (!selectedFile) return;
-      
+
       log('senderLog', '正在生成连接代码...', 'info');
-      
+
       try {
-        peer = new Peer();
-        
+        // 使用免费的公共信令服务器，添加超时配置
+        peer = new Peer(null, {
+          debug: 2,
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+          }
+        });
+
         peer.on('open', (id) => {
+          log('senderLog', 'PeerID 已生成: ' + id, 'info');
+
           const code = btoa(JSON.stringify({
             peerId: id,
             fileName: selectedFile.name,
             fileSize: selectedFile.size,
             fileType: selectedFile.type
           }));
-          
+
           document.getElementById('senderCode').textContent = code;
           document.getElementById('senderCodeBox').style.display = 'block';
           log('senderLog', '连接代码已生成，请发送给接收方', 'success');
         });
+
+        // 30秒超时
+        const timeout = setTimeout(() => {
+          if (!peer.id) {
+            log('senderLog', '连接信令服务器超时，请重试', 'error');
+            if (peer) peer.destroy();
+          }
+        }, 30000);
+
+        peer.on('open', () => clearTimeout(timeout));
         
         peer.on('connection', (conn) => {
           connection = conn;
@@ -618,12 +639,33 @@
     // 接收传输请求
     async function acceptTransfer(peerId) {
       log('receiverLog', '正在连接发送方...', 'info');
-      
+
       try {
-        peer = new Peer();
-        
+        peer = new Peer(null, {
+          debug: 2,
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' }
+            ]
+          }
+        });
+
+        // 30秒超时
+        const timeout = setTimeout(() => {
+          if (!peer.id) {
+            log('receiverLog', '连接信令服务器超时，请重试', 'error');
+            if (peer) peer.destroy();
+          }
+        }, 30000);
+
         peer.on('open', () => {
-          connection = peer.connect(peerId);
+          clearTimeout(timeout);
+          log('receiverLog', '已连接到信令服务器', 'info');
+
+          connection = peer.connect(peerId, {
+            reliable: true
+          });
           
           connection.on('open', () => {
             log('receiverLog', '已连接到发送方，等待文件传输...', 'success');
