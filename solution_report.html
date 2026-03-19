@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>卫星物联网海上救生衣整体解决方案</title>
+  <style>
+    :root {
+      --navy: #0a1628;
+      --deep-blue: #0d2147;
+      --blue: #1a3a6e;
+      --accent: #0066cc;
+      --cyan: #00aadd;
+      --teal: #00c4b4;
+      --gold: #f0a500;
+      --amber: #ff8c00;
+      --light: #e8f4fd;
+      --white: #ffffff;
+      --gray: #8899aa;
+      --text: #ddeeff;
+      --card-bg: rgba(255,255,255,0.05);
+      --border: rgba(0,170,221,0.2);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: linear-gradient(160deg, #050e1f 0%, #0a1628 40%, #071730 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===================== HEADER ===================== */
+    .header {
+      position: relative;
+      padding: 60px 40px 50px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(0,100,200,0.15) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(0,170,221,0.12) 0%, transparent 70%);
+    }
+    .header-badge {
+      display: inline-block;
+      padding: 4px 16px;
+      background: rgba(0,170,221,0.15);
+      border: 1px solid rgba(0,170,221,0.4);
+      border-radius: 20px;
+      font-size: 12px;
+      color: var(--cyan);
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 36px;
+      font-weight: 700;
+      background: linear-gradient(90deg, #ffffff 0%, #80d4ff 50%, #00aadd 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .header-sub {
+      font-size: 16px;
+      color: var(--gray);
+      margin-bottom: 30px;
+    }
+    .header-meta {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      flex-wrap: wrap;
+    }
+    .header-meta span {
+      font-size: 13px;
+      color: var(--cyan);
+      opacity: 0.8;
+    }
+
+    /* ===================== NAV ===================== */
+    .toc {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      background: rgba(0,0,0,0.2);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .toc a {
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      color: var(--gray);
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .toc a:hover {
+      color: var(--cyan);
+      border-color: rgba(0,170,221,0.4);
+      background: rgba(0,170,221,0.08);
+    }
+
+    /* ===================== MAIN ===================== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    /* ===================== SECTION ===================== */
+    .section {
+      margin-bottom: 60px;
+    }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .section-num {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--cyan));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .section-title {
+      font-size: 22px; font-weight: 700;
+      color: #ffffff;
+    }
+    .section-desc {
+      font-size: 14px; color: var(--gray);
+      margin-top: 2px;
+    }
+    .section-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0,170,221,0.3), transparent);
+    }
+
+    /* ===================== CARDS ===================== */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: rgba(0,170,221,0.4); }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+    /* ===================== STAT CARDS ===================== */
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+    }
+    .stat-card.blue::before { background: linear-gradient(90deg, var(--accent), var(--cyan)); }
+    .stat-card.gold::before { background: linear-gradient(90deg, var(--gold), var(--amber)); }
+    .stat-card.teal::before { background: linear-gradient(90deg, var(--teal), #00e5d0); }
+    .stat-card.red::before { background: linear-gradient(90deg, #e55, #ff8080); }
+    .stat-num {
+      font-size: 30px; font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .stat-card.blue .stat-num { color: var(--cyan); }
+    .stat-card.gold .stat-num { color: var(--gold); }
+    .stat-card.teal .stat-num { color: var(--teal); }
+    .stat-card.red .stat-num { color: #ff8080; }
+    .stat-label { font-size: 12px; color: var(--gray); }
+    .stat-note { font-size: 11px; color: var(--gray); margin-top: 6px; opacity: 0.7; }
+
+    /* ===================== ARCH DIAGRAM ===================== */
+    .arch-wrapper {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .arch-layer {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .arch-layer:last-child { margin-bottom: 0; }
+    .arch-layer-title {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      color: var(--gray);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .arch-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .arch-box {
+      flex: 1;
+      min-width: 140px;
+      padding: 14px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      border: 1px solid;
+    }
+    .arch-box.sky {
+      background: rgba(0,102,204,0.12);
+      border-color: rgba(0,102,204,0.35);
+      color: #7fb8ff;
+    }
+    .arch-box.ocean {
+      background: rgba(0,200,180,0.1);
+      border-color: rgba(0,200,180,0.35);
+      color: #5ae8da;
+    }
+    .arch-box.platform {
+      background: rgba(240,165,0,0.1);
+      border-color: rgba(240,165,0,0.35);
+      color: #ffc955;
+    }
+    .arch-box.device {
+      background: rgba(180,80,220,0.1);
+      border-color: rgba(180,80,220,0.35);
+      color: #cc88ff;
+    }
+    .arch-box.terminal {
+      background: rgba(0,170,221,0.1);
+      border-color: rgba(0,170,221,0.35);
+      color: var(--cyan);
+    }
+    .arch-arrow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+      color: rgba(0,170,221,0.4);
+      font-size: 18px;
+      gap: 8px;
+    }
+    .arch-arrow span {
+      font-size: 11px;
+      color: rgba(0,170,221,0.5);
+    }
+    .arch-connector {
+      width: 2px;
+      height: 20px;
+      background: linear-gradient(180deg, rgba(0,170,221,0.6), transparent);
+      margin: 0 auto;
+    }
+
+    /* ===================== TECH COMPARE ===================== */
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .compare-table th {
+      padding: 12px 16px;
+      background: rgba(0,102,204,0.15);
+      text-align: left;
+      font-weight: 600;
+      color: var(--cyan);
+      border-bottom: 2px solid rgba(0,170,221,0.2);
+    }
+    .compare-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      color: #ccd8e8;
+      vertical-align: middle;
+    }
+    .compare-table tr:hover td { background: rgba(0,170,221,0.04); }
+    .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-green { background: rgba(0,200,100,0.15); color: #44dd88; border: 1px solid rgba(0,200,100,0.3); }
+    .tag-yellow { background: rgba(240,165,0,0.15); color: #ffc955; border: 1px solid rgba(240,165,0,0.3); }
+    .tag-red { background: rgba(220,50,50,0.15); color: #ff8080; border: 1px solid rgba(220,50,50,0.3); }
+    .tag-blue { background: rgba(0,102,204,0.15); color: #7fb8ff; border: 1px solid rgba(0,102,204,0.3); }
+    .tag-star { background: linear-gradient(135deg,rgba(0,102,204,0.25),rgba(0,170,221,0.25)); color: #80d4ff; border: 1px solid rgba(0,170,221,0.5); }
+
+    /* ===================== PRODUCT CARD ===================== */
+    .product-hero {
+      background: linear-gradient(135deg, rgba(0,60,120,0.3), rgba(0,30,80,0.4));
+      border: 1px solid rgba(0,170,221,0.25);
+      border-radius: 20px;
+      padding: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+    .product-name {
+      font-size: 26px; font-weight: 700; color: #fff;
+      margin-bottom: 8px;
+    }
+    .product-tagline {
+      font-size: 14px; color: var(--cyan); margin-bottom: 20px;
+    }
+    .spec-list { list-style: none; }
+    .spec-list li {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-size: 13px;
+    }
+    .spec-list li:last-child { border: none; }
+    .spec-key { color: var(--gray); }
+    .spec-val { color: #fff; font-weight: 500; }
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      background: rgba(0,170,221,0.06);
+      border: 1px solid rgba(0,170,221,0.15);
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .feature-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: rgba(0,170,221,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .feature-text { font-size: 12px; color: #ccd8e8; line-height: 1.5; }
+    .feature-text strong { color: #fff; display: block; margin-bottom: 2px; font-size: 13px; }
+
+    /* ===================== PLATFORM ===================== */
+    .platform-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .platform-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .platform-card::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+    }
+    .platform-card.p1::after { background: linear-gradient(90deg, #0066cc, #00aadd); }
+    .platform-card.p2::after { background: linear-gradient(90deg, #f0a500, #ff8c00); }
+    .platform-card.p3::after { background: linear-gradient(90deg, #00c4b4, #00e5d0); }
+    .platform-icon { font-size: 32px; margin-bottom: 14px; }
+    .platform-name { font-size: 17px; font-weight: 700; color: #fff; margin-bottom: 6px; }
+    .platform-sub { font-size: 12px; color: var(--gray); margin-bottom: 16px; }
+    .platform-features { list-style: none; }
+    .platform-features li {
+      font-size: 12px; color: #aabbcc;
+      padding: 5px 0;
+      padding-left: 16px;
+      position: relative;
+    }
+    .platform-features li::before {
+      content: '▸';
+      position: absolute; left: 0;
+      color: var(--cyan);
+    }
+
+    /* ===================== CUSTOMER ===================== */
+    .customer-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .customer-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 22px;
+    }
+    .customer-type {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .customer-icon {
+      width: 44px; height: 44px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+    .customer-title { font-size: 16px; font-weight: 700; color: #fff; }
+    .customer-sub { font-size: 12px; color: var(--gray); }
+    .pain-list, .value-list { list-style: none; }
+    .pain-list li, .value-list li {
+      font-size: 12px;
+      padding: 5px 0;
+      padding-left: 18px;
+      position: relative;
+      color: #aabbcc;
+    }
+    .pain-list li::before { content: '•'; position: absolute; left: 4px; color: #ff8080; }
+    .value-list li::before { content: '✓'; position: absolute; left: 2px; color: var(--teal); }
+    .section-subtitle { font-size: 12px; font-weight: 600; color: var(--gray); margin: 12px 0 6px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* ===================== ROADMAP ===================== */
+    .roadmap {
+      position: relative;
+      padding-left: 30px;
+    }
+    .roadmap::before {
+      content: '';
+      position: absolute;
+      left: 11px; top: 0; bottom: 0;
+      width: 2px;
+      background: linear-gradient(180deg, var(--accent), var(--cyan), transparent);
+    }
+    .roadmap-item {
+      position: relative;
+      margin-bottom: 32px;
+    }
+    .roadmap-dot {
+      position: absolute;
+      left: -22px; top: 6px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid rgba(0,102,204,0.5);
+      box-shadow: 0 0 12px rgba(0,102,204,0.5);
+    }
+    .roadmap-dot.active {
+      background: var(--cyan);
+      border-color: rgba(0,170,221,0.5);
+      box-shadow: 0 0 16px rgba(0,170,221,0.6);
+    }
+    .roadmap-phase {
+      display: inline-block;
+      font-size: 11px; font-weight: 600;
+      color: var(--cyan);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .roadmap-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .roadmap-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .roadmap-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .roadmap-tag {
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      background: rgba(0,102,204,0.15);
+      color: #7fb8ff;
+      border: 1px solid rgba(0,102,204,0.25);
+    }
+
+    /* ===================== MARKET ===================== */
+    .market-chart {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      height: 180px;
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      margin-bottom: 16px;
+    }
+    .bar-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      height: 100%;
+    }
+    .bar {
+      width: 100%;
+      border-radius: 6px 6px 0 0;
+      position: relative;
+      transition: opacity 0.2s;
+      cursor: default;
+    }
+    .bar:hover { opacity: 0.85; }
+    .bar-val {
+      position: absolute;
+      top: -22px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px; font-weight: 600; color: #fff;
+      white-space: nowrap;
+    }
+    .bar-label { margin-top: 8px; font-size: 11px; color: var(--gray); }
+    .chart-legend {
+      display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;
+    }
+    .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--gray); }
+    .legend-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+    /* ===================== RISK ===================== */
+    .risk-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .risk-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .risk-header {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 10px;
+    }
+    .risk-level {
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px; font-weight: 600;
+    }
+    .risk-level.high { background: rgba(220,50,50,0.15); color: #ff8080; border: 1px solid rgba(220,50,50,0.3); }
+    .risk-level.med { background: rgba(240,165,0,0.15); color: #ffc955; border: 1px solid rgba(240,165,0,0.3); }
+    .risk-level.low { background: rgba(0,200,100,0.15); color: #44dd88; border: 1px solid rgba(0,200,100,0.3); }
+    .risk-name { font-size: 14px; font-weight: 600; color: #fff; }
+    .risk-desc { font-size: 12px; color: #aabbcc; margin-bottom: 10px; }
+    .risk-strategy { font-size: 12px; color: var(--teal); }
+
+    /* ===================== FOOTER ===================== */
+    .footer {
+      text-align: center;
+      padding: 40px;
+      border-top: 1px solid var(--border);
+      color: var(--gray);
+      font-size: 13px;
+    }
+    .footer strong { color: var(--cyan); }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 900px) {
+      .stat-cards { grid-template-columns: repeat(2, 1fr); }
+      .grid-3, .platform-cards { grid-template-columns: 1fr 1fr; }
+      .product-hero, .grid-2, .customer-grid, .risk-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .stat-cards { grid-template-columns: 1fr 1fr; }
+      .grid-3, .platform-cards, .grid-4 { grid-template-columns: 1fr; }
+      .header h1 { font-size: 24px; }
+      .toc { display: none; }
+    }
+
+    /* scroll to top */
+    .back-top {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: rgba(0,102,204,0.6);
+      border: 1px solid rgba(0,170,221,0.4);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      color: var(--cyan);
+      font-size: 18px;
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+      text-decoration: none;
+    }
+    .back-top:hover { background: rgba(0,102,204,0.9); }
+
+    .highlight-box {
+      background: rgba(0,170,221,0.08);
+      border-left: 3px solid var(--cyan);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 18px;
+      font-size: 13px;
+      color: #ccd8e8;
+      margin-bottom: 20px;
+      line-height: 1.8;
+    }
+
+    .moat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .moat-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      text-align: center;
+    }
+    .moat-icon { font-size: 28px; margin-bottom: 10px; }
+    .moat-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+    .moat-desc { font-size: 12px; color: #aabbcc; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-badge">CONFIDENTIAL DRAFT · 2026.03</div>
+  <h1>卫星物联网海上救生衣<br>整体解决方案</h1>
+  <div class="header-sub">以卫星物联网模组为底层 · 海上救生衣为旗舰产品 · 面向政府及军工客户</div>
+  <div class="header-meta">
+    <span>🛰 卫星通信 + 北斗定位</span>
+    <span>🌊 海上救援硬件</span>
+    <span>🏛 政府军工市场</span>
+    <span>📡 全栈物联网平台</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="toc">
+  <a href="#market">市场机会</a>
+  <a href="#arch">整体架构</a>
+  <a href="#tech">技术选型</a>
+  <a href="#product">硬件产品</a>
+  <a href="#platform">软件平台</a>
+  <a href="#customer">客户策略</a>
+  <a href="#roadmap">路线规划</a>
+  <a href="#moat">竞争壁垒</a>
+  <a href="#risk">风险应对</a>
+</nav>
+
+<div class="container">
+
+  <!-- ============ SECTION 1: MARKET ============ -->
+  <section class="section" id="market">
+    <div class="section-header">
+      <div class="section-num">01</div>
+      <div>
+        <div class="section-title">市场机会与背景</div>
+        <div class="section-desc">行业规模、政策驱动与核心痛点</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card blue">
+        <div class="stat-num">454亿</div>
+        <div class="stat-label">2025年中国卫星互联网产业规模</div>
+        <div class="stat-note">年增速约35%，持续加速</div>
+      </div>
+      <div class="stat-card gold">
+        <div class="stat-num">25亿$</div>
+        <div class="stat-label">2025年全球卫星物联服务收入</div>
+        <div class="stat-note">中国贡献率超30%</div>
+      </div>
+      <div class="stat-card teal">
+        <div class="stat-num">23.1%</div>
+        <div class="stat-label">全球卫星IoT市场CAGR（2025-2034）</div>
+        <div class="stat-note">2024年基数约20亿美元</div>
+      </div>
+      <div class="stat-card red">
+        <div class="stat-num">1200万</div>
+        <div class="stat-label">2025年全球卫星物联终端出货量预测</div>
+        <div class="stat-note">同比增长超60%</div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="gap:20px">
+      <div class="card">
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;">📋 政策强力驱动</div>
+        <ul style="list-style:none;">
+          <li style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#aabbcc;">✅ 国家发改委将卫星互联网纳入<strong style="color:#fff">新基建</strong>，计划2025年前完成1.3万颗低轨卫星组网</li>
+          <li style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#aabbcc;">✅ 交通运输部等23个部门联合发布海上搜救应急能力建设意见，推动智能装备替换</li>
+          <li style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#aabbcc;">✅ 北斗三号已全球覆盖，北斗短报文已标准化，相关国标完善推动规模应用</li>
+          <li style="padding:7px 0;font-size:13px;color:#aabbcc;">✅ 海事局颁布渔船安全技术规程，逐步强制要求船载定位通信设备</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;">⚠️ 核心痛点与机会</div>
+        <ul style="list-style:none;">
+          <li style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#aabbcc;">🔴 传统救生衣<strong style="color:#fff">无定位、无通信</strong>，落水后无法被精确搜救</li>
+          <li style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#aabbcc;">🔴 海上无地面网络覆盖，4G/5G信号缺失，传统IoT方案完全失效</li>
+          <li style="padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:13px;color:#aabbcc;">🟡 现有EPIRB/AIS设备体积大、价格高（5000元+）、无法整合IoT管理</li>
+          <li style="padding:7px 0;font-size:13px;color:#aabbcc;">🟢 军工/政府对<strong style="color:#fff">国产自主可控</strong>要求强烈，是天然的替代窗口</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Bar Chart -->
+    <div class="card" style="margin-top:20px">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:20px;">📊 卫星物联网市场规模预测（亿美元）</div>
+      <div class="market-chart">
+        <div class="bar-group">
+          <div class="bar" style="height:28%;background:linear-gradient(180deg,#0066cc,#003d7a)">
+            <span class="bar-val">20</span>
+          </div>
+          <div class="bar-label">2024</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height:35%;background:linear-gradient(180deg,#0077dd,#004899)">
+            <span class="bar-val">25</span>
+          </div>
+          <div class="bar-label">2025E</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height:43%;background:linear-gradient(180deg,#0088ee,#0055aa)">
+            <span class="bar-val">31</span>
+          </div>
+          <div class="bar-label">2026E</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height:53%;background:linear-gradient(180deg,#00aadd,#0066bb)">
+            <span class="bar-val">38</span>
+          </div>
+          <div class="bar-label">2027E</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height:64%;background:linear-gradient(180deg,#00bbcc,#0077bb)">
+            <span class="bar-val">47</span>
+          </div>
+          <div class="bar-label">2028E</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height:77%;background:linear-gradient(180deg,#00ccbb,#0088bb)">
+            <span class="bar-val">57</span>
+          </div>
+          <div class="bar-label">2029E</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar" style="height:92%;background:linear-gradient(180deg,#00ddb0,#0099aa)">
+            <span class="bar-val">70+</span>
+          </div>
+          <div class="bar-label">2030E</div>
+        </div>
+      </div>
+      <div class="chart-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#00aadd"></div>全球规模（CAGR 23.1%）</div>
+        <div class="legend-item" style="color:#7fb8ff">中国贡献约30%以上</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 2: ARCH ============ -->
+  <section class="section" id="arch">
+    <div class="section-header">
+      <div class="section-num">02</div>
+      <div>
+        <div class="section-title">整体解决方案架构</div>
+        <div class="section-desc">五层体系架构，从物理硬件到业务应用的全栈布局</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="arch-wrapper">
+      <!-- 卫星层 -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">🛰 太空层 · 卫星通信网络</div>
+        <div class="arch-row">
+          <div class="arch-box sky">北斗三号<br><small style="font-weight:400;font-size:11px">RDSS短报文 / 定位</small></div>
+          <div class="arch-box sky">天通一号<br><small style="font-weight:400;font-size:11px">卫星移动通信</small></div>
+          <div class="arch-box sky">低轨LEO星座<br><small style="font-weight:400;font-size:11px">NTN-IoT / 高频次过境</small></div>
+          <div class="arch-box sky">GEO高通量<br><small style="font-weight:400;font-size:11px">回传带宽保障</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕ <span>双向卫星链路（上行指令 + 下行数据）</span></div>
+
+      <!-- 模组层 -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">🔌 连接层 · 卫星物联网模组（核心底层产品）</div>
+        <div class="arch-row">
+          <div class="arch-box ocean">多模通信模组<br><small style="font-weight:400;font-size:11px">北斗+天通+NTN合一</small></div>
+          <div class="arch-box ocean">低功耗设计<br><small style="font-weight:400;font-size:11px">超低待机功耗，电池可用3年</small></div>
+          <div class="arch-box ocean">防水防盐雾<br><small style="font-weight:400;font-size:11px">IP68 / 海洋级防腐</small></div>
+          <div class="arch-box ocean">硬件开发SDK<br><small style="font-weight:400;font-size:11px">开放给第三方硬件开发者</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕ <span>硬件集成 · 模组嵌入终端设备</span></div>
+
+      <!-- 硬件层 -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">🦺 终端层 · 智能硬件产品</div>
+        <div class="arch-row">
+          <div class="arch-box device" style="border-color:rgba(180,80,220,0.6);background:rgba(180,80,220,0.15)">
+            ★ 旗舰：智能救生衣<br><small style="font-weight:400;font-size:11px">第一款量产硬件产品</small>
+          </div>
+          <div class="arch-box device">海上浮标<br><small style="font-weight:400;font-size:11px">扩展产品线</small></div>
+          <div class="arch-box device">船载终端<br><small style="font-weight:400;font-size:11px">扩展产品线</small></div>
+          <div class="arch-box device">应急通信背包<br><small style="font-weight:400;font-size:11px">扩展产品线</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕ <span>数据上报 · 双向指令通信</span></div>
+
+      <!-- 平台层 -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">⚙️ 平台层 · 三大软件平台</div>
+        <div class="arch-row">
+          <div class="arch-box platform">物联网管理平台<br><small style="font-weight:400;font-size:11px">设备管理 / 实时监控 / GIS态势</small></div>
+          <div class="arch-box platform">硬件开发平台<br><small style="font-weight:400;font-size:11px">模组SDK / 固件OTA / 开发文档</small></div>
+          <div class="arch-box platform">物联网卡管理平台<br><small style="font-weight:400;font-size:11px">卡生命周期 / 流量策略 / 计费</small></div>
+        </div>
+      </div>
+      <div class="arch-arrow">↕ <span>API接口 · 标准化数据对接</span></div>
+
+      <!-- 应用层 -->
+      <div class="arch-layer">
+        <div class="arch-layer-title">🏛 应用层 · 客户业务系统</div>
+        <div class="arch-row">
+          <div class="arch-box terminal">海上搜救指挥系统</div>
+          <div class="arch-box terminal">军队/武警应急通信</div>
+          <div class="arch-box terminal">渔船安全管理系统</div>
+          <div class="arch-box terminal">海洋执法监控平台</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 3: TECH ============ -->
+  <section class="section" id="tech">
+    <div class="section-header">
+      <div class="section-num">03</div>
+      <div>
+        <div class="section-title">技术路线选型</div>
+        <div class="section-desc">核心模组通信技术方案对比分析</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="highlight-box">
+      <strong>推荐策略：以北斗短报文为主通道，天通一号为双向数据备份，预留低轨NTN-IoT接口，形成三层冗余的"自主可控"卫星通信架构。</strong><br>
+      这一策略同时满足：① 国产自主可控要求（全部为中国卫星系统）；② 全球海域覆盖能力；③ 超低功耗终端需求；④ 向未来低轨星座演进的技术前瞻性。
+    </div>
+
+    <div class="card" style="overflow:auto">
+      <table class="compare-table">
+        <thead>
+          <tr>
+            <th>技术路线</th>
+            <th>卫星系统</th>
+            <th>通信能力</th>
+            <th>终端功耗</th>
+            <th>覆盖范围</th>
+            <th>自主可控</th>
+            <th>模组成本</th>
+            <th>推荐度</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong style="color:#fff">北斗三号短报文</strong></td>
+            <td>中国北斗</td>
+            <td>双向 / 1000字节/次</td>
+            <td><span class="tag tag-green">超低 ≤1W</span></td>
+            <td>中国区域+全球</td>
+            <td><span class="tag tag-green">完全自主</span></td>
+            <td><span class="tag tag-green">低 ¥200-400</span></td>
+            <td><span class="tag tag-star">★ 主推</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:#fff">天通一号卫星通信</strong></td>
+            <td>中国天通</td>
+            <td>双向语音+数据</td>
+            <td><span class="tag tag-yellow">中等 2-5W</span></td>
+            <td>中国领土领海周边</td>
+            <td><span class="tag tag-green">完全自主</span></td>
+            <td><span class="tag tag-yellow">中 ¥500-800</span></td>
+            <td><span class="tag tag-blue">备选主推</span></td>
+          </tr>
+          <tr>
+            <td><strong style="color:#fff">3GPP NTN-NB-IoT</strong></td>
+            <td>低轨LEO商业星座</td>
+            <td>双向数据，低时延</td>
+            <td><span class="tag tag-yellow">中等 1-3W</span></td>
+            <td>全球</td>
+            <td><span class="tag tag-yellow">部分自主</span></td>
+            <td><span class="tag tag-yellow">中 ¥300-600</span></td>
+            <td><span class="tag tag-blue">未来演进</span></td>
+          </tr>
+          <tr>
+            <td>Iridium / Globalstar</td>
+            <td>美国商业卫星</td>
+            <td>双向数据+语音</td>
+            <td><span class="tag tag-yellow">中等 2-4W</span></td>
+            <td>全球</td>
+            <td><span class="tag tag-red">不可控</span></td>
+            <td><span class="tag tag-red">高 ¥1000+</span></td>
+            <td><span class="tag tag-red">排除</span></td>
+          </tr>
+          <tr>
+            <td>AIS / EPIRB（传统）</td>
+            <td>VHF / 406MHz</td>
+            <td>单向广播为主</td>
+            <td><span class="tag tag-yellow">中等</span></td>
+            <td>近海</td>
+            <td><span class="tag tag-yellow">国际标准</span></td>
+            <td><span class="tag tag-red">高 ¥2000+</span></td>
+            <td><span class="tag tag-red">传统替代对象</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-3" style="margin-top:20px">
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:10px;">🛰 北斗短报文优势</div>
+        <ul style="list-style:none;font-size:12px;color:#aabbcc;">
+          <li style="padding:4px 0">• 北斗三号已具备全球覆盖能力</li>
+          <li style="padding:4px 0">• 双向通信，可接收搜救指令确认</li>
+          <li style="padding:4px 0">• 政策支持强，国家标准已完善</li>
+          <li style="padding:4px 0">• 军工/政府客户的首选指定通信方式</li>
+          <li style="padding:4px 0">• 模组成本已降至百元级</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px;">📡 天通一号补充价值</div>
+        <ul style="list-style:none;font-size:12px;color:#aabbcc;">
+          <li style="padding:4px 0">• 支持语音通话，救生衣可实现语音求救</li>
+          <li style="padding:4px 0">• 数据带宽更大，可传输生命体征实时数据</li>
+          <li style="padding:4px 0">• 覆盖中国海域，南海、东海全部覆盖</li>
+          <li style="padding:4px 0">• 与北斗形成双备份，可靠性大幅提升</li>
+          <li style="padding:4px 0">• 面向军工场景的首选补充通信手段</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div style="font-size:14px;font-weight:700;color:var(--teal);margin-bottom:10px;">🔮 NTN低轨演进方向</div>
+        <ul style="list-style:none;font-size:12px;color:#aabbcc;">
+          <li style="padding:4px 0">• 3GPP R17已标准化，生态逐步成熟</li>
+          <li style="padding:4px 0">• 支持蜂窝+卫星无缝切换</li>
+          <li style="padding:4px 0">• 时延低于GEO，更适合实时监控</li>
+          <li style="padding:4px 0">• 预留模组接口，2027年以后平滑升级</li>
+          <li style="padding:4px 0">• 需关注国内低轨星座建设进展</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 4: PRODUCT ============ -->
+  <section class="section" id="product">
+    <div class="section-header">
+      <div class="section-num">04</div>
+      <div>
+        <div class="section-title">旗舰硬件产品：智能救生衣</div>
+        <div class="section-desc">第一款量产硬件 · 核心验证场景 · 打开政府军工市场的敲门砖</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="product-hero">
+      <div>
+        <div class="product-name">SatVest Pro · 卫星智能救生衣</div>
+        <div class="product-tagline">海上落水即时定位 · 双向通信 · 生命体征监测 · 全球可救援</div>
+        <ul class="spec-list">
+          <li><span class="spec-key">通信方案</span><span class="spec-val">北斗短报文（主）+ 天通（备）</span></li>
+          <li><span class="spec-key">定位精度</span><span class="spec-val">北斗RNSS ≤2.5m（CEP）</span></li>
+          <li><span class="spec-key">通信周期</span><span class="spec-val">正常3分钟/次，告警立即上报</span></li>
+          <li><span class="spec-key">电池续航</span><span class="spec-val">待机≥72小时 / 告警模式≥24小时</span></li>
+          <li><span class="spec-key">防护等级</span><span class="spec-val">IP68，防水深度≥2米 / 耐盐雾</span></li>
+          <li><span class="spec-key">充气方式</span><span class="spec-val">自动充气（入水感应）+ 手动备用</span></li>
+          <li><span class="spec-key">传感器</span><span class="spec-val">心率/体温/姿态/水浸感应器</span></li>
+          <li><span class="spec-key">重量</span><span class="spec-val">≤380g（含智能模组）</span></li>
+          <li><span class="spec-key">工作温度</span><span class="spec-val">-20°C ~ +60°C</span></li>
+          <li><span class="spec-key">认证</span><span class="spec-val">CCS船级社认证 / 军标GJB认证（计划）</span></li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--gray);margin-bottom:14px;letter-spacing:1px;">CORE FEATURES · 核心功能</div>
+        <div class="feature-grid">
+          <div class="feature-item">
+            <div class="feature-icon">📍</div>
+            <div class="feature-text"><strong>精确定位上报</strong>落水后自动触发，实时上报北斗坐标，精确到米级</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📢</div>
+            <div class="feature-text"><strong>双向SOS通信</strong>搜救指令可下发确认，受难者接收响应，减少绝望等待</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">❤️</div>
+            <div class="feature-text"><strong>生命体征监测</strong>实时上报心率、体温、姿态，判断溺水/失温风险</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">💡</div>
+            <div class="feature-text"><strong>频闪定位信号</strong>高亮LED闪烁 + 声光报警，配合视觉定位</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🌡</div>
+            <div class="feature-text"><strong>低温保温辅助</strong>智能感知低温环境，提示保温体位建议</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🔋</div>
+            <div class="feature-text"><strong>超长待机设计</strong>日常穿戴状态低功耗，落水自动唤醒全功能</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">📲</div>
+            <div class="feature-text"><strong>OTA远程升级</strong>固件可远程更新，功能持续迭代，无需回收</div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-icon">🛡</div>
+            <div class="feature-text"><strong>军事级安全</strong>国密加密算法，通信数据全程加密，防截获</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:20px">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:14px;">🎯 产品线扩展路径（基于同一模组底座）</div>
+      <div class="grid-4">
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;margin-bottom:8px">🦺</div>
+          <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px">智能救生衣</div>
+          <div style="font-size:11px;color:var(--teal)">旗舰 · 2026年Q2</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:6px">先行量产，打开市场</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;margin-bottom:8px">🚢</div>
+          <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px">船载位置终端</div>
+          <div style="font-size:11px;color:var(--cyan)">扩展 · 2026年Q4</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:6px">渔船/巡逻艇资产追踪</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;margin-bottom:8px">📦</div>
+          <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px">海上浮标传感器</div>
+          <div style="font-size:11px;color:var(--cyan)">扩展 · 2027年Q1</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:6px">海洋环境监测网络</div>
+        </div>
+        <div class="card" style="text-align:center">
+          <div style="font-size:28px;margin-bottom:8px">🎒</div>
+          <div style="font-size:14px;font-weight:700;color:#fff;margin-bottom:4px">单兵应急通信</div>
+          <div style="font-size:11px;color:var(--gold)">军工 · 2027年Q2</div>
+          <div style="font-size:11px;color:var(--gray);margin-top:6px">陆地/岛礁特种作战</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 5: PLATFORM ============ -->
+  <section class="section" id="platform">
+    <div class="section-header">
+      <div class="section-num">05</div>
+      <div>
+        <div class="section-title">三大软件平台</div>
+        <div class="section-desc">硬件之上的软件生态，实现持续价值与护城河</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="platform-cards">
+      <div class="platform-card p1">
+        <div class="platform-icon">🗺</div>
+        <div class="platform-name">物联网管理平台</div>
+        <div class="platform-sub">IoT Management Platform</div>
+        <ul class="platform-features">
+          <li>设备全生命周期管理（注册/激活/注销）</li>
+          <li>GIS地图实时态势显示，设备位置热力图</li>
+          <li>告警事件管理与搜救任务调度</li>
+          <li>历史轨迹回放与行为分析</li>
+          <li>批量设备固件OTA升级管理</li>
+          <li>设备健康状态监控（电量/信号/传感器）</li>
+          <li>多级权限管理（国家/省市/基层单位）</li>
+          <li>支持私有化部署，满足军工保密要求</li>
+        </ul>
+        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="tag tag-blue">Web端</span>
+          <span class="tag tag-blue">移动端APP</span>
+          <span class="tag tag-blue">指挥大屏</span>
+          <span class="tag tag-green">私有化部署</span>
+        </div>
+      </div>
+
+      <div class="platform-card p2">
+        <div class="platform-icon">⚙️</div>
+        <div class="platform-name">硬件开发平台</div>
+        <div class="platform-sub">Hardware Development Platform</div>
+        <ul class="platform-features">
+          <li>模组SDK与API文档中心（C/Python/Java）</li>
+          <li>硬件参考设计（原理图/PCB/BOM开放）</li>
+          <li>仿真调试工具与云端测试环境</li>
+          <li>固件版本管理与发布流程</li>
+          <li>第三方硬件开发者认证体系</li>
+          <li>合作伙伴应用案例库与技术支持</li>
+          <li>硬件接入认证测试套件</li>
+          <li>积木式功能模块快速集成</li>
+        </ul>
+        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="tag tag-yellow">开发者门户</span>
+          <span class="tag tag-yellow">生态拓展</span>
+          <span class="tag tag-yellow">ISV认证</span>
+        </div>
+      </div>
+
+      <div class="platform-card p3">
+        <div class="platform-icon">📶</div>
+        <div class="platform-name">物联网卡管理平台</div>
+        <div class="platform-sub">SIM / Satellite Card Management</div>
+        <ul class="platform-features">
+          <li>北斗智能卡全生命周期管理</li>
+          <li>卡状态实时监控（激活/休眠/注销）</li>
+          <li>流量/报文用量计费与账单管理</li>
+          <li>批量卡操作与自动化策略配置</li>
+          <li>异常流量检测与安全告警</li>
+          <li>多运营商/多卫星系统统一管理</li>
+          <li>报文套餐灵活定制，适配不同频次需求</li>
+          <li>API开放，对接客户采购与财务系统</li>
+        </ul>
+        <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">
+          <span class="tag tag-green">北斗卡</span>
+          <span class="tag tag-green">天通卡</span>
+          <span class="tag tag-green">NTN卡（规划）</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:16px;">🔗 平台集成关系与数据流</div>
+      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:center">
+        <div style="text-align:center;padding:12px 20px;background:rgba(0,102,204,0.15);border-radius:10px;border:1px solid rgba(0,102,204,0.3)">
+          <div style="font-size:12px;color:#7fb8ff;margin-bottom:4px">硬件终端</div>
+          <div style="font-size:11px;color:var(--gray)">救生衣/传感器</div>
+        </div>
+        <div style="color:var(--cyan);font-size:20px">→</div>
+        <div style="text-align:center;padding:12px 20px;background:rgba(0,200,180,0.1);border-radius:10px;border:1px solid rgba(0,200,180,0.3)">
+          <div style="font-size:12px;color:#5ae8da;margin-bottom:4px">物联网卡管理平台</div>
+          <div style="font-size:11px;color:var(--gray)">卡认证/计费</div>
+        </div>
+        <div style="color:var(--cyan);font-size:20px">→</div>
+        <div style="text-align:center;padding:12px 20px;background:rgba(0,170,221,0.1);border-radius:10px;border:1px solid rgba(0,170,221,0.3)">
+          <div style="font-size:12px;color:var(--cyan);margin-bottom:4px">物联网管理平台</div>
+          <div style="font-size:11px;color:var(--gray)">设备管理/态势</div>
+        </div>
+        <div style="color:var(--cyan);font-size:20px">↔</div>
+        <div style="text-align:center;padding:12px 20px;background:rgba(240,165,0,0.1);border-radius:10px;border:1px solid rgba(240,165,0,0.3)">
+          <div style="font-size:12px;color:#ffc955;margin-bottom:4px">客户业务系统</div>
+          <div style="font-size:11px;color:var(--gray)">API/私有化对接</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--gray);text-align:center">
+        硬件开发平台为横向支撑，贯穿模组研发→终端开发→合作伙伴生态全流程
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 6: CUSTOMER ============ -->
+  <section class="section" id="customer">
+    <div class="section-header">
+      <div class="section-num">06</div>
+      <div>
+        <div class="section-title">目标客户与市场策略</div>
+        <div class="section-desc">政府军工为核心，分层突破，构建标杆案例</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="customer-grid">
+      <div class="customer-card">
+        <div class="customer-type">
+          <div class="customer-icon" style="background:rgba(220,50,50,0.15)">⚓</div>
+          <div>
+            <div class="customer-title">海军/海警</div>
+            <div class="customer-sub">第一优先级 · 军工准入 · 战略意义最大</div>
+          </div>
+        </div>
+        <div class="section-subtitle">核心痛点</div>
+        <ul class="pain-list">
+          <li>海上作业人员落水定位困难，搜救效率低</li>
+          <li>现有救援设备多依赖进口，安全隐患</li>
+          <li>单兵通信在远海失去网络覆盖</li>
+        </ul>
+        <div class="section-subtitle">我方价值</div>
+        <ul class="value-list">
+          <li>北斗+天通双通信，纯国产自主可控</li>
+          <li>国密加密，通信数据军事级安全</li>
+          <li>按军标GJB要求设计，可申报采购目录</li>
+          <li>私有化部署，数据不出军网</li>
+        </ul>
+        <div style="margin-top:12px;font-size:12px;color:var(--gray)">
+          <strong style="color:var(--cyan)">突破路径：</strong>通过中国兵器、中电科等军工集团体系内合作，军品认证后进入军队采购目录
+        </div>
+      </div>
+
+      <div class="customer-card">
+        <div class="customer-type">
+          <div class="customer-icon" style="background:rgba(240,165,0,0.12)">🏛</div>
+          <div>
+            <div class="customer-title">交通运输部/海事局</div>
+            <div class="customer-sub">第二优先级 · 政府采购 · 规模化潜力最大</div>
+          </div>
+        </div>
+        <div class="section-subtitle">核心痛点</div>
+        <ul class="pain-list">
+          <li>全国渔船安全监管难，事故频发</li>
+          <li>海上搜救能力建设资金有充足预算</li>
+          <li>传统设备无法统一管理和数据汇聚</li>
+        </ul>
+        <div class="section-subtitle">我方价值</div>
+        <ul class="value-list">
+          <li>救生衣 + 管理平台一体化交付</li>
+          <li>数据汇聚能力，支撑政府数字化监管</li>
+          <li>符合海事局渔船技术规程要求</li>
+          <li>支持省/市/县分级管理架构</li>
+        </ul>
+        <div style="margin-top:12px;font-size:12px;color:var(--gray)">
+          <strong style="color:var(--cyan)">突破路径：</strong>申请交通运输部安全装备试点，通过地方海事局示范项目快速铺量
+        </div>
+      </div>
+
+      <div class="customer-card">
+        <div class="customer-type">
+          <div class="customer-icon" style="background:rgba(0,200,180,0.12)">🚨</div>
+          <div>
+            <div class="customer-title">应急管理部/消防救援</div>
+            <div class="customer-sub">第三优先级 · 应急通信场景 · 扩展产品线切入</div>
+          </div>
+        </div>
+        <div class="section-subtitle">核心痛点</div>
+        <ul class="pain-list">
+          <li>灾害现场通信中断，人员定位困难</li>
+          <li>洪涝/地震后地面网络全部失效</li>
+          <li>应急指挥缺乏实时态势感知</li>
+        </ul>
+        <div class="section-subtitle">我方价值</div>
+        <ul class="value-list">
+          <li>卫星通信不依赖地面网络，天然优势</li>
+          <li>北斗+天通组网，应急场景完美契合</li>
+          <li>平台支持与应急管理部系统对接</li>
+          <li>模组可集成到各类应急装备</li>
+        </ul>
+        <div style="margin-top:12px;font-size:12px;color:var(--gray)">
+          <strong style="color:var(--cyan)">突破路径：</strong>参与应急部"北斗应急信息综合管理"项目投标，以解决方案商身份切入
+        </div>
+      </div>
+
+      <div class="customer-card">
+        <div class="customer-type">
+          <div class="customer-icon" style="background:rgba(0,102,204,0.15)">🐟</div>
+          <div>
+            <div class="customer-title">渔业管理局/涉海企业</div>
+            <div class="customer-sub">商业化补充 · 量大面广 · 快速跑量</div>
+          </div>
+        </div>
+        <div class="section-subtitle">核心痛点</div>
+        <ul class="pain-list">
+          <li>渔船出海安全事故频发，家属担忧</li>
+          <li>海洋石油平台工作人员安全管理需求</li>
+          <li>远洋渔业需实时了解船员位置状态</li>
+        </ul>
+        <div class="section-subtitle">我方价值</div>
+        <ul class="value-list">
+          <li>相对经济的解决方案，大规模配发可行</li>
+          <li>SaaS模式订阅，持续服务收入</li>
+          <li>批量采购下具备价格竞争力</li>
+          <li>试点积累后形成行业标准话语权</li>
+        </ul>
+        <div style="margin-top:12px;font-size:12px;color:var(--gray)">
+          <strong style="color:var(--cyan)">突破路径：</strong>联合地方渔业协会开展安全科普+试点，政府补贴撬动规模推广
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 7: ROADMAP ============ -->
+  <section class="section" id="roadmap">
+    <div class="section-header">
+      <div class="section-num">07</div>
+      <div>
+        <div class="section-title">产品发展路线图</div>
+        <div class="section-desc">2026-2028年三年战略规划</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="grid-2" style="gap:32px;align-items:start">
+      <div class="roadmap">
+        <div class="roadmap-item">
+          <div class="roadmap-dot active"></div>
+          <div class="roadmap-phase">PHASE 1 · 2026 Q1-Q2</div>
+          <div class="roadmap-title">产品研发与验证</div>
+          <div class="roadmap-content">
+            <div class="roadmap-tags">
+              <span class="roadmap-tag">北斗+天通模组研发</span>
+              <span class="roadmap-tag">救生衣原型机制作</span>
+              <span class="roadmap-tag">物联网管理平台MVP</span>
+              <span class="roadmap-tag">物联网卡管理平台基础版</span>
+              <span class="roadmap-tag">海上功能测试</span>
+              <span class="roadmap-tag">CCS认证申请</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="roadmap-item">
+          <div class="roadmap-dot active"></div>
+          <div class="roadmap-phase">PHASE 2 · 2026 Q3-Q4</div>
+          <div class="roadmap-title">试点部署与政府突破</div>
+          <div class="roadmap-content">
+            <div class="roadmap-tags">
+              <span class="roadmap-tag">海事局示范项目落地</span>
+              <span class="roadmap-tag">海军/海警试用合作</span>
+              <span class="roadmap-tag">100套以内小规模试点</span>
+              <span class="roadmap-tag">军品认证启动</span>
+              <span class="roadmap-tag">硬件开发平台上线</span>
+              <span class="roadmap-tag">合作伙伴招募</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="roadmap">
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          <div class="roadmap-phase">PHASE 3 · 2027 Q1-Q2</div>
+          <div class="roadmap-title">规模化采购与产品扩展</div>
+          <div class="roadmap-content">
+            <div class="roadmap-tags">
+              <span class="roadmap-tag">首批政府/军工批量采购</span>
+              <span class="roadmap-tag">救生衣千台级出货</span>
+              <span class="roadmap-tag">船载终端产品发布</span>
+              <span class="roadmap-tag">NTN-IoT接口预埋</span>
+              <span class="roadmap-tag">平台功能迭代增强</span>
+              <span class="roadmap-tag">SaaS服务体系建立</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="roadmap-item">
+          <div class="roadmap-dot"></div>
+          <div class="roadmap-phase">PHASE 4 · 2027 Q3 - 2028</div>
+          <div class="roadmap-title">平台化生态与行业标准</div>
+          <div class="roadmap-content">
+            <div class="roadmap-tags">
+              <span class="roadmap-tag">万台量级规模部署</span>
+              <span class="roadmap-tag">单兵应急通信产品</span>
+              <span class="roadmap-tag">海洋浮标传感器产品</span>
+              <span class="roadmap-tag">参与行业标准制定</span>
+              <span class="roadmap-tag">开发者生态1000+</span>
+              <span class="roadmap-tag">海外市场探索</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:24px">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:16px;">💰 商业模式设计</div>
+      <div class="grid-4">
+        <div style="text-align:center;padding:16px;background:rgba(0,102,204,0.1);border-radius:12px;border:1px solid rgba(0,102,204,0.2)">
+          <div style="font-size:24px;margin-bottom:8px">📦</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">硬件销售</div>
+          <div style="font-size:11px;color:var(--gray)">救生衣/终端设备一次性购买，政府集中采购</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:rgba(0,200,180,0.1);border-radius:12px;border:1px solid rgba(0,200,180,0.2)">
+          <div style="font-size:24px;margin-bottom:8px">📶</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">通信服务费</div>
+          <div style="font-size:11px;color:var(--gray)">按月/按年收取卫星通信资费，稳定经常性收入</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:rgba(240,165,0,0.1);border-radius:12px;border:1px solid rgba(240,165,0,0.2)">
+          <div style="font-size:24px;margin-bottom:8px">☁️</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">平台SaaS</div>
+          <div style="font-size:11px;color:var(--gray)">平台订阅费，按接入设备数量计费，越用越便宜</div>
+        </div>
+        <div style="text-align:center;padding:16px;background:rgba(180,80,220,0.1);border-radius:12px;border:1px solid rgba(180,80,220,0.2)">
+          <div style="font-size:24px;margin-bottom:8px">🔧</div>
+          <div style="font-size:13px;font-weight:700;color:#fff;margin-bottom:4px">集成与服务</div>
+          <div style="font-size:11px;color:var(--gray)">私有化部署、定制开发、系统集成、运维服务</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 8: MOAT ============ -->
+  <section class="section" id="moat">
+    <div class="section-header">
+      <div class="section-num">08</div>
+      <div>
+        <div class="section-title">核心竞争壁垒</div>
+        <div class="section-desc">差异化优势与可持续护城河构建</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="moat-grid">
+      <div class="moat-card">
+        <div class="moat-icon">🛡</div>
+        <div class="moat-title">自主可控卫星通信</div>
+        <div class="moat-desc">全面采用北斗+天通国产卫星系统，满足政府军工对自主可控的强制要求，是进入军工采购的必要门槛，竞争对手无法绕过</div>
+      </div>
+      <div class="moat-card">
+        <div class="moat-icon">🔐</div>
+        <div class="moat-title">军事级安全认证</div>
+        <div class="moat-desc">国密加密算法集成，按GJB军标设计，通过CCS/军品双认证后形成资质壁垒，一旦进入采购目录，替换成本极高</div>
+      </div>
+      <div class="moat-card">
+        <div class="moat-icon">📊</div>
+        <div class="moat-title">全栈数据闭环</div>
+        <div class="moat-desc">从硬件终端→通信网络→管理平台的垂直整合，形成独特的海上人员数据资产，越用数据越丰富，越难以替代</div>
+      </div>
+      <div class="moat-card">
+        <div class="moat-icon">🌐</div>
+        <div class="moat-title">开发者生态</div>
+        <div class="moat-desc">通过硬件开发平台向第三方开放模组能力，吸引生态合作伙伴基于同一底座开发更多产品，形成平台网络效应</div>
+      </div>
+      <div class="moat-card">
+        <div class="moat-icon">📋</div>
+        <div class="moat-title">标准制定话语权</div>
+        <div class="moat-desc">通过大规模落地案例积累，积极参与海上救援、北斗物联等行业标准制定，将产品技术路线固化为行业规范</div>
+      </div>
+      <div class="moat-card">
+        <div class="moat-icon">🤝</div>
+        <div class="moat-title">政府关系深度绑定</div>
+        <div class="moat-desc">政府和军工客户天然的高切换成本，一旦完成私有化部署和系统集成，竞争对手几乎无法低成本替换</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION 9: RISK ============ -->
+  <section class="section" id="risk">
+    <div class="section-header">
+      <div class="section-num">09</div>
+      <div>
+        <div class="section-title">风险识别与应对</div>
+        <div class="section-desc">主要风险因素分析与管控策略</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+
+    <div class="risk-grid">
+      <div class="risk-card">
+        <div class="risk-header">
+          <span class="risk-level high">高风险</span>
+          <span class="risk-name">军品认证周期长</span>
+        </div>
+        <div class="risk-desc">军品认证和进入军队采购目录通常需要2-3年，资金和时间成本高，期间无法获得军工收入。</div>
+        <div class="risk-strategy">✅ 策略：先做民口政府客户（海事局、渔业局）快速跑量，同步启动军品认证，利用早期收入支撑认证成本。</div>
+      </div>
+
+      <div class="risk-card">
+        <div class="risk-header">
+          <span class="risk-level high">高风险</span>
+          <span class="risk-name">卫星通信成本过高</span>
+        </div>
+        <div class="risk-desc">北斗短报文通信费用按次计费，高频上报场景下通信成本可能导致产品竞争力下降。</div>
+        <div class="risk-strategy">✅ 策略：智能自适应上报频率（日常低频+告警高频），优化数据包大小，与运营商谈政企专项套餐。</div>
+      </div>
+
+      <div class="risk-card">
+        <div class="risk-header">
+          <span class="risk-level high">高风险</span>
+          <span class="risk-name">大厂竞争入局</span>
+        </div>
+        <div class="risk-desc">中国兵器北斗院、中电科等国有军工背景企业已在布局，资源和渠道远超创业公司。</div>
+        <div class="risk-strategy">✅ 策略：专注细分场景（海上救生），做出更深度的垂直产品；通过合作而非对抗，成为军工集团的技术方案提供商。</div>
+      </div>
+
+      <div class="risk-card">
+        <div class="risk-header">
+          <span class="risk-level med">中等风险</span>
+          <span class="risk-name">产品可靠性要求极高</span>
+        </div>
+        <div class="risk-desc">救生衣在极端海况下必须稳定工作，任何硬件故障可能直接导致救援失败，法律和声誉风险极高。</div>
+        <div class="risk-strategy">✅ 策略：产品设计高可靠性冗余，严格测试流程，购买产品责任险，早期客户严格管控使用场景。</div>
+      </div>
+
+      <div class="risk-card">
+        <div class="risk-header">
+          <span class="risk-level med">中等风险</span>
+          <span class="risk-name">北斗卡审批政策变化</span>
+        </div>
+        <div class="risk-desc">北斗三号短报文智能卡由国家统一管理，政策调整可能影响商业化节奏。</div>
+        <div class="risk-strategy">✅ 策略：保持天通一号备用通道，持续跟踪政策动态，与主管机构保持良好沟通，提前布局NTN备选方案。</div>
+      </div>
+
+      <div class="risk-card">
+        <div class="risk-header">
+          <span class="risk-level low">低风险</span>
+          <span class="risk-name">硬件供应链风险</span>
+        </div>
+        <div class="risk-desc">北斗/天通模组芯片供应商较少，供应链集中度高，可能出现交期和价格风险。</div>
+        <div class="risk-strategy">✅ 策略：建立多家芯片商备选，提前签订框架协议，合理备货，推动模组设计兼容多款芯片。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="section">
+    <div class="section-header">
+      <div class="section-num">10</div>
+      <div>
+        <div class="section-title">方案总结与核心判断</div>
+      </div>
+      <div class="section-line"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:15px;font-weight:700;color:#fff;margin-bottom:16px;">💡 战略价值判断</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:rgba(0,200,100,0.06);border:1px solid rgba(0,200,100,0.2);border-radius:10px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#44dd88;margin-bottom:10px">✅ 这件事情值得做的理由</div>
+          <ul style="list-style:none;font-size:12px;color:#aabbcc;line-height:2">
+            <li>• 政策与市场双重驱动，风口明确</li>
+            <li>• 国产替代窗口期，竞争格局尚未固化</li>
+            <li>• 北斗基础设施已成熟，底层不确定性低</li>
+            <li>• 客单价高，政府采购付款有保障</li>
+            <li>• 硬件+通信+平台三层收入，商业模式健康</li>
+            <li>• 救生衣是高情感附加值产品，有故事可讲</li>
+          </ul>
+        </div>
+        <div style="background:rgba(240,165,0,0.06);border:1px solid rgba(240,165,0,0.2);border-radius:10px;padding:16px">
+          <div style="font-size:13px;font-weight:700;color:#ffc955;margin-bottom:10px">⚠️ 需要特别重视的挑战</div>
+          <ul style="list-style:none;font-size:12px;color:#aabbcc;line-height:2">
+            <li>• 军工准入需要时间和关系，不可操之过急</li>
+            <li>• 硬件+软件+通信全栈能力要求高，团队配置关键</li>
+            <li>• 产品可靠性是生命线，不能用互联网快糙猛思路</li>
+            <li>• 通信成本需要精细化运营，不能无脑堆功能</li>
+            <li>• 客户决策周期长，需要充裕资金储备</li>
+          </ul>
+        </div>
+      </div>
+      <div class="highlight-box" style="margin-top:20px;margin-bottom:0">
+        <strong>核心战略建议：</strong>以"模组+救生衣"为切入点，用最快速度拿到海事局/渔业局第一个示范项目，建立政府背书，再以此撬动军工准入；软件平台从第一天就要有私有化部署能力；通信模组保持开放，通过硬件开发平台招募生态合作伙伴，避免单打独斗——把自己做成这个场景的"水电煤"基础设施，而不只是一件救生衣。
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">卫星物联网海上救生衣整体解决方案</div>
+  <div>机密草稿 · 仅供内部讨论 · <strong>2026年3月</strong></div>
+  <div style="margin-top:8px;color:rgba(136,153,170,0.5)">数据来源：赛迪顾问、IoT Analytics、GMInsights、交通运输部公开政策文件</div>
+</div>
+
+<a href="#" class="back-top">↑</a>
+
+</body>
+</html>
