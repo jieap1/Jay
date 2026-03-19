@@ -635,11 +635,13 @@
           })
           .then(() => {
             // 显示连接代码和 Offer
-            const connectionCode = btoa(JSON.stringify({
+            // 使用 encodeURIComponent 处理中文
+            const fileInfo = JSON.stringify({
               fileName: selectedFile.name,
               fileSize: selectedFile.size,
               fileType: selectedFile.type
-            }));
+            });
+            const connectionCode = btoa(encodeURIComponent(fileInfo));
             
             document.getElementById('senderCode').textContent = connectionCode;
             document.getElementById('senderCodeBox').style.display = 'block';
@@ -764,7 +766,7 @@
       }
 
       try {
-        const data = JSON.parse(atob(codeText));
+        const data = JSON.parse(decodeURIComponent(atob(codeText)));
         log('receiverLog', `解析成功，文件: ${data.fileName} (${formatSize(data.fileSize)})`, 'success');
         totalSize = data.fileSize;
         
